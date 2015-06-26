@@ -1,0 +1,15 @@
+[package]
+name = "czt"
+version = "0.0.1"
+authors = ["Ivan Ukhov <ivan.ukhov@gmail.com>"]
+license = "MIT"
+repository = "https://github.com/stainless-steel/czt"
+homepage = "https://github.com/stainless-steel/czt"
+documentation = "https://stainless-steel.github.io/czt"
+description = "The package provides a chirp Z-transform algorithm."
+
+[dependencies]
+complex = "*"
+
+[dev-dependencies]
+assert = "*"
