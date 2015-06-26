@@ -5,7 +5,7 @@
 extern crate complex;
 extern crate fft;
 
-use complex::c64;
+use complex::{Complex, c64};
 use std::ops::Mul;
 
 macro_rules! add_padding(
@@ -27,31 +27,41 @@ macro_rules! increase_to_power_of_two(
 );
 
 /// Perform the forward transformation.
-pub fn forward<T>(data: &[T]) -> Vec<c64> where T: Mul<c64, Output=c64> + Copy {
+///
+/// ## References
+///
+/// 1. https://en.wikipedia.org/wiki/Chirp_Z-transform#Bluestein.27s_algorithm
+pub fn forward<T>(data: &[T], m: usize, w: c64, a: c64) -> Vec<c64>
+    where T: Mul<c64, Output=c64> + Copy
+{
     const ONE: c64 = c64(1.0, 0.0);
     const ZERO: c64 = c64(0.0, 0.0);
 
-    let size = data.len();
+    let n = data.len();
 
     let chirp = {
-        use std::f64::consts::PI;
-        let theta = -2.0 * PI / size as f64;
-        ((-(size as isize) + 1)..(size as isize)).map(|i| {
-            let argument = theta * (i * i) as f64 / 2.0;
-            c64(argument.cos(), argument.sin())
+        let (modulus, argument) = w.to_polar();
+        ((-(n as isize) + 1)..(if n > m { n } else { m } as isize)).map(|i| {
+            let power = (i * i) as f64 / 2.0;
+            c64::from_polar(modulus.powf(power), argument * power)
         }).collect::<Vec<_>>()
     };
 
-    let n = increase_to_power_of_two!(2 * size - 1);
+    let p = increase_to_power_of_two!(n + m - 1);
 
-    let mut buffer1 = Vec::with_capacity(n);
-    for i in 0..size {
-        buffer1.push(data[i] * chirp[size + i - 1]);
+    let mut buffer1 = Vec::with_capacity(p);
+    {
+        let (modulus, argument) = a.to_polar();
+        for i in 0..n {
+            let power = -(i as f64);
+            let a = c64::from_polar(modulus.powf(power), argument * power);
+            buffer1.push(data[i] * chirp[n + i - 1] * a);
+        }
     }
     add_padding!(&mut buffer1, ZERO);
 
-    let mut buffer2 = Vec::with_capacity(n);
-    for i in 0..(2 * size - 1) {
+    let mut buffer2 = Vec::with_capacity(p);
+    for i in 0..(n + m - 1) {
         buffer2.push(ONE / chirp[i]);
     }
     add_padding!(&mut buffer2, ZERO);
@@ -59,11 +69,11 @@ pub fn forward<T>(data: &[T]) -> Vec<c64> where T: Mul<c64, Output=c64> + Copy {
     fft::complex::forward(&mut buffer1);
     fft::complex::forward(&mut buffer2);
 
-    for i in 0..n {
+    for i in 0..p {
         buffer1[i] = buffer1[i] * buffer2[i];
     }
 
     fft::complex::inverse(&mut buffer1);
 
-    ((size - 1)..(2 * size - 1)).map(|i| buffer1[i] * chirp[i]).collect()
+    ((n - 1)..(n + m - 1)).map(|i| buffer1[i] * chirp[i]).collect()
 }
