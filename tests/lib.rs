@@ -169,7 +169,7 @@ fn forward_complex_different_w() {
 
     let m = data.len() / 2;
     let result = czt::forward(as_c64(&data), m, c64(0.9, -0.6), c64(1.0, 0.0));
-    assert::close(as_f64(&result), &expected_result[..], 1e-11);
+    assert::close(as_f64(&result), &expected_result[..], 1e-10);
 }
 
 #[test]
