@@ -6,6 +6,7 @@ extern crate complex;
 extern crate fft;
 
 use complex::c64;
+use std::ops::Mul;
 
 macro_rules! add_padding(
     ($buffer:expr, $value:expr) => ({
@@ -25,7 +26,8 @@ macro_rules! increase_to_power_of_two(
     });
 );
 
-pub fn forward(data: &[f64]) -> Vec<c64> {
+/// Perform the forward transformation.
+pub fn forward<T>(data: &[T]) -> Vec<c64> where T: Mul<c64, Output=c64> + Copy {
     const ONE: c64 = c64(1.0, 0.0);
     const ZERO: c64 = c64(0.0, 0.0);
 
@@ -44,7 +46,7 @@ pub fn forward(data: &[f64]) -> Vec<c64> {
 
     let mut buffer1 = Vec::with_capacity(n);
     for i in 0..size {
-        buffer1.push(chirp[size + i - 1] * data[i]);
+        buffer1.push(data[i] * chirp[size + i - 1]);
     }
     add_padding!(&mut buffer1, ZERO);
 
