@@ -3,5 +3,9 @@ sudo: required
 
 after_success: curl https://stainless-steel.github.io/travis/after_success.sh | bash
 
+env:
+  global:
+    secure: Dmd9L1pJ65mcHFqR4X1qes+wZ9M0G3/DFsW9drJ9KZarkCeryGx+ZginU0C+tUvWwFxBWH85DivjEazFwvFNWB30owRBVfsNNSo+WrHthQwUlDGimRJunELUEwQtzG8Zztldxq5E5mD9etPTSXoWa9yaZtW3xLGm8VxM5O+fgMyk4wlIYcr7t0V/zQ8+5ZRfKobudm1kkCmVas3XssIjG+Ec3Y2DsytiwY0hjNO9hfvK+MHCBcTjiWIcNiMvL94IyqPS5oHRV+iFBmTh4V3ANkjtYt3milK8jWyKW90Dbf5yM7IeSRNEG1CLKYOizUU+vRuYEvA6NO2vUZXCuQQ+m8GH7/IPJiUtSVgl9Pav4KjomrlzRo5jMovLO/n04w+9xfknJIfYSfHgN/6psR7zUOA3PKwvaCo8otwbr4bEtG4lmEILAwWLWUQ0CxdWu+X9MYcnZGuT2Vc8sFSSxClGBOks5XjWsvqO5I0pb+fiveBPywSE94QjiUX6nxYcWL587pvLt4MhIz1l59AXpkLjFV66QH1dqS+WNtMFSDzeCq1oDh2AiNpnbZn/p4BphbNQAzA/2D+QA/4KZaZRn+d1nsewciZMwcapWOGwGwmgLAZKUXtum+gLWI8RN7OKb0ZBuc+7E5dlsJ8NvZLYLKteG/mIjolZdjexPhHari5XSR4=
+
 notifications:
   email: false
