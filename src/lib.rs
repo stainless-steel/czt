@@ -39,7 +39,7 @@ pub fn forward<T>(data: &[T], m: usize, w: c64, a: c64) -> Vec<c64>
 
     let n = data.len();
 
-    let chirp = {
+    let factor = {
         let (modulus, argument) = w.to_polar();
         ((-(n as isize) + 1)..(if n > m { n } else { m } as isize)).map(|i| {
             let power = (i * i) as f64 / 2.0;
@@ -55,14 +55,14 @@ pub fn forward<T>(data: &[T], m: usize, w: c64, a: c64) -> Vec<c64>
         for i in 0..n {
             let power = -(i as f64);
             let a = c64::from_polar(modulus.powf(power), argument * power);
-            buffer1.push(data[i] * chirp[n + i - 1] * a);
+            buffer1.push(data[i] * factor[n + i - 1] * a);
         }
     }
     add_padding!(&mut buffer1, ZERO);
 
     let mut buffer2 = Vec::with_capacity(p);
     for i in 0..(n + m - 1) {
-        buffer2.push(ONE / chirp[i]);
+        buffer2.push(ONE / factor[i]);
     }
     add_padding!(&mut buffer2, ZERO);
 
@@ -75,5 +75,5 @@ pub fn forward<T>(data: &[T], m: usize, w: c64, a: c64) -> Vec<c64>
 
     fft::complex::inverse(&mut buffer1);
 
-    ((n - 1)..(n + m - 1)).map(|i| buffer1[i] * chirp[i]).collect()
+    ((n - 1)..(n + m - 1)).map(|i| buffer1[i] * factor[i]).collect()
 }
