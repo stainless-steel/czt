@@ -7,8 +7,7 @@ use complex::{Complex, c64};
 macro_rules! chirp(
     ($m:expr) => ({
         use std::f64::consts::PI;
-        let theta = -2.0 * PI / $m as f64;
-        c64(theta.cos(), theta.sin())
+        c64::from_polar(1.0, -2.0 * PI / $m as f64)
     });
 );
 
