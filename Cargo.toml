@@ -10,7 +10,7 @@ description = "The package provides a chirp Z-transform algorithm."
 
 [dependencies]
 complex = "*"
-fft = "*"
+dft = "*"
 
 [dev-dependencies]
 assert = "*"

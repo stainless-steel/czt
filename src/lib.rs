@@ -3,7 +3,7 @@
 //! [1]: https://en.wikipedia.org/wiki/Chirp_Z-transform
 
 extern crate complex;
-extern crate fft;
+extern crate dft;
 
 use complex::{Complex, c64};
 use std::ops::Mul;
@@ -66,14 +66,14 @@ pub fn forward<T>(data: &[T], m: usize, w: c64, a: c64) -> Vec<c64>
     }
     add_padding!(&mut buffer2, ZERO);
 
-    fft::complex::forward(&mut buffer1);
-    fft::complex::forward(&mut buffer2);
+    dft::complex::forward(&mut buffer1);
+    dft::complex::forward(&mut buffer2);
 
     for i in 0..p {
         buffer1[i] = buffer1[i] * buffer2[i];
     }
 
-    fft::complex::inverse(&mut buffer1);
+    dft::complex::inverse(&mut buffer1);
 
     ((n - 1)..(n + m - 1)).map(|i| buffer1[i] * factor[i]).collect()
 }
