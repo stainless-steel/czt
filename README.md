@@ -1,6 +1,6 @@
 # CZT [![Version][version-img]][version-url] [![Status][status-img]][status-url]
 
-The package provides a [chirp Z-transform][1] algorithm.
+The package provides an algorithm to compute the [chirp Z-transform][1].
 
 ## [Documentation][doc]
 

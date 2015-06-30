@@ -1,4 +1,4 @@
-//! [Chirp Z-transform][1] algorithm.
+//! [Chirp Z-transform][1].
 //!
 //! [1]: https://en.wikipedia.org/wiki/Chirp_Z-transform
 
