@@ -18,14 +18,6 @@ macro_rules! add_padding(
     });
 );
 
-macro_rules! increase_to_power_of_two(
-    ($number:expr) => ({
-        let number = $number;
-        assert!(number > 0);
-        1 << ((number as f64).log2().ceil() as usize)
-    });
-);
-
 /// Perform the forward transformation.
 ///
 /// ## References
@@ -47,7 +39,7 @@ pub fn forward<T>(data: &[T], m: usize, w: c64, a: c64) -> Vec<c64>
         }).collect::<Vec<_>>()
     };
 
-    let p = increase_to_power_of_two!(n + m - 1);
+    let p = (n + m - 1).next_power_of_two();
 
     let mut buffer1 = Vec::with_capacity(p);
     {
