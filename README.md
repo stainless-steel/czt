@@ -12,7 +12,7 @@ The package provides an algorithm to compute the [chirp Z-transform][1].
 
 [1]: https://en.wikipedia.org/wiki/Chirp_Z-transform
 
-[version-img]: https://img.shields.io/crates/v/czt.svg
+[version-img]: http://stainless-steel.github.io/images/crates.svg
 [version-url]: https://crates.io/crates/czt
 [status-img]: https://travis-ci.org/stainless-steel/czt.svg?branch=master
 [status-url]: https://travis-ci.org/stainless-steel/czt
