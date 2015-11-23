@@ -1,6 +1,6 @@
 [package]
 name = "czt"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Ivan Ukhov <ivan.ukhov@gmail.com>"]
 license = "MIT"
 repository = "https://github.com/stainless-steel/czt"
@@ -11,6 +11,7 @@ The package provides an algorithm to compute the chirp Z-transform."""
 
 [dependencies]
 dft = "0.4"
+num = "^0.1.28"
 
 [dev-dependencies]
 assert = "0.6"
