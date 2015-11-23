@@ -10,8 +10,7 @@ description = """
 The package provides an algorithm to compute the chirp Z-transform."""
 
 [dependencies]
-complex = "0.7"
-dft = "0.2"
+dft = "0.4"
 
 [dev-dependencies]
 assert = "0.6"

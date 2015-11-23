@@ -2,10 +2,9 @@
 //!
 //! [1]: https://en.wikipedia.org/wiki/Chirp_Z-transform
 
-extern crate complex;
 extern crate dft;
 
-use complex::{Complex, c64};
+pub use dft::{Operation, Plan, Transform, c64};
 use std::ops::Mul;
 
 macro_rules! add_padding(
@@ -26,8 +25,8 @@ macro_rules! add_padding(
 pub fn forward<T>(data: &[T], m: usize, w: c64, a: c64) -> Vec<c64>
     where T: Mul<c64, Output=c64> + Copy
 {
-    const ONE: c64 = c64(1.0, 0.0);
-    const ZERO: c64 = c64(0.0, 0.0);
+    const ONE: c64 = c64 { re: 1.0, im: 0.0 };
+    const ZERO: c64 = c64 { re: 0.0, im: 0.0 };
 
     let n = data.len();
 
@@ -35,7 +34,7 @@ pub fn forward<T>(data: &[T], m: usize, w: c64, a: c64) -> Vec<c64>
         let (modulus, argument) = w.to_polar();
         ((-(n as isize) + 1)..(if n > m { n } else { m } as isize)).map(|i| {
             let power = (i * i) as f64 / 2.0;
-            c64::from_polar(modulus.powf(power), argument * power)
+            c64::from_polar(&modulus.powf(power), &(argument * power))
         }).collect::<Vec<_>>()
     };
 
@@ -46,7 +45,7 @@ pub fn forward<T>(data: &[T], m: usize, w: c64, a: c64) -> Vec<c64>
         let (modulus, argument) = a.to_polar();
         for i in 0..n {
             let power = -(i as f64);
-            let a = c64::from_polar(modulus.powf(power), argument * power);
+            let a = c64::from_polar(&modulus.powf(power), &(argument * power));
             buffer1.push(data[i] * factor[n + i - 1] * a);
         }
     }
@@ -58,14 +57,16 @@ pub fn forward<T>(data: &[T], m: usize, w: c64, a: c64) -> Vec<c64>
     }
     add_padding!(&mut buffer2, ZERO);
 
-    dft::complex::forward(&mut buffer1);
-    dft::complex::forward(&mut buffer2);
+    let plan = Plan::new(Operation::Forward, p);
+    buffer1.transform(&plan);
+    buffer2.transform(&plan);
 
     for i in 0..p {
         buffer1[i] = buffer1[i] * buffer2[i];
     }
 
-    dft::complex::inverse(&mut buffer1);
+    let plan = Plan::new(Operation::Inverse, p);
+    buffer1.transform(&plan);
 
     ((n - 1)..(n + m - 1)).map(|i| buffer1[i] * factor[i]).collect()
 }
