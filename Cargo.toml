@@ -12,4 +12,4 @@ repository = "https://github.com/stainless-steel/czt"
 dft = "0.4"
 
 [dev-dependencies]
-assert = "0.6"
+assert = "0.7"
