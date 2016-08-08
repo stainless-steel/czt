@@ -1,6 +1,6 @@
 [package]
 name = "czt"
-version = "0.2.4"
+version = "0.3.0"
 license = "Apache-2.0/MIT"
 authors = ["Ivan Ukhov <ivan.ukhov@gmail.com>"]
 description = "The package provides an algorithm to compute the chirp Z-transform."
@@ -10,6 +10,8 @@ repository = "https://github.com/stainless-steel/czt"
 
 [dependencies]
 dft = "0.5"
+num-complex = { version = "0.1", default-features = false }
+num-traits = { version = "0.1", default-features = false }
 
 [dev-dependencies]
 assert = "0.7"

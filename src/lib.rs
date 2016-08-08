@@ -3,70 +3,81 @@
 //! [1]: https://en.wikipedia.org/wiki/Chirp_Z-transform
 
 extern crate dft;
+extern crate num_complex;
+extern crate num_traits;
 
-pub use dft::{Operation, Plan, Transform, c64};
+use num_complex::Complex;
+use num_traits::Float;
 use std::ops::Mul;
 
+/// A complex number with 32-bit parts.
+#[allow(non_camel_case_types)]
+pub type c32 = Complex<f32>;
+
+/// A complex number with 64-bit parts.
+#[allow(non_camel_case_types)]
+pub type c64 = Complex<f64>;
+
+/// The transform.
+pub trait Transform<T> {
+    /// Perform the transform.
+    ///
+    /// ## References
+    ///
+    /// 1. https://en.wikipedia.org/wiki/Chirp_Z-transform#Bluestein.27s_algorithm
+    fn transform(&self, m: usize, w: Complex<T>, a: Complex<T>) -> Vec<Complex<T>>;
+}
+
 macro_rules! add_padding(
-    ($buffer:expr, $value:expr) => ({
+    ($buffer:expr) => ({
         let buffer = $buffer;
+        let zero = Complex::zero();
         let capacity = buffer.capacity();
         while buffer.len() < capacity {
-            buffer.push($value);
+            buffer.push(zero);
         }
     });
 );
 
-/// Perform the forward transformation.
-///
-/// ## References
-///
-/// 1. https://en.wikipedia.org/wiki/Chirp_Z-transform#Bluestein.27s_algorithm
-pub fn forward<T>(data: &[T], m: usize, w: c64, a: c64) -> Vec<c64>
-    where T: Mul<c64, Output=c64> + Copy
-{
-    const ONE: c64 = c64 { re: 1.0, im: 0.0 };
-    const ZERO: c64 = c64 { re: 0.0, im: 0.0 };
+impl<D, T> Transform<T> for [D] where D: Copy + Mul<Complex<T>, Output=Complex<T>>, T: Float {
+    fn transform(&self, m: usize, w: Complex<T>, a: Complex<T>) -> Vec<Complex<T>> {
+        use dft::{Operation, Plan, Transform};
+        use num_traits::{One, Zero};
 
-    let n = data.len();
-
-    let factor = {
-        let (modulus, argument) = w.to_polar();
-        ((-(n as isize) + 1)..(if n > m { n } else { m } as isize)).map(|i| {
-            let power = (i * i) as f64 / 2.0;
-            c64::from_polar(&modulus.powf(power), &(argument * power))
-        }).collect::<Vec<_>>()
-    };
-
-    let p = (n + m - 1).next_power_of_two();
-
-    let mut buffer1 = Vec::with_capacity(p);
-    {
-        let (modulus, argument) = a.to_polar();
-        for i in 0..n {
-            let power = -(i as f64);
-            let a = c64::from_polar(&modulus.powf(power), &(argument * power));
-            buffer1.push(data[i] * factor[n + i - 1] * a);
+        let n = self.len();
+        let factor = {
+            let two = T::one() + T::one();
+            let (modulus, argument) = w.to_polar();
+            ((-(n as isize) + 1)..(if n > m { n } else { m } as isize)).map(|i| {
+                let power = T::from(i * i).unwrap() / two;
+                Complex::from_polar(&modulus.powf(power), &(argument * power))
+            }).collect::<Vec<_>>()
+        };
+        let p = (n + m - 1).next_power_of_two();
+        let mut buffer1 = Vec::with_capacity(p);
+        {
+            let (modulus, argument) = a.to_polar();
+            for i in 0..n {
+                let power = -T::from(i).unwrap();
+                let a = Complex::from_polar(&modulus.powf(power), &(argument * power));
+                buffer1.push(self[i] * factor[n + i - 1] * a);
+            }
         }
+        add_padding!(&mut buffer1);
+        let one = Complex::one();
+        let mut buffer2 = Vec::with_capacity(p);
+        for i in 0..(n + m - 1) {
+            buffer2.push(one / factor[i]);
+        }
+        add_padding!(&mut buffer2);
+        let plan = Plan::new(Operation::Forward, p);
+        buffer1.transform(&plan);
+        buffer2.transform(&plan);
+        for i in 0..p {
+            buffer1[i] = buffer1[i] * buffer2[i];
+        }
+        let plan = Plan::new(Operation::Inverse, p);
+        buffer1.transform(&plan);
+        ((n - 1)..(n + m - 1)).map(|i| buffer1[i] * factor[i]).collect()
     }
-    add_padding!(&mut buffer1, ZERO);
-
-    let mut buffer2 = Vec::with_capacity(p);
-    for i in 0..(n + m - 1) {
-        buffer2.push(ONE / factor[i]);
-    }
-    add_padding!(&mut buffer2, ZERO);
-
-    let plan = Plan::new(Operation::Forward, p);
-    buffer1.transform(&plan);
-    buffer2.transform(&plan);
-
-    for i in 0..p {
-        buffer1[i] = buffer1[i] * buffer2[i];
-    }
-
-    let plan = Plan::new(Operation::Inverse, p);
-    buffer1.transform(&plan);
-
-    ((n - 1)..(n + m - 1)).map(|i| buffer1[i] * factor[i]).collect()
 }

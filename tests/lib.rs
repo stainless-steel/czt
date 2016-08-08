@@ -1,7 +1,7 @@
 extern crate assert;
 extern crate czt;
 
-use czt::c64;
+use czt::{Transform, c64};
 
 macro_rules! chirp(
     ($m:expr) => ({
@@ -38,7 +38,7 @@ fn forward_real() {
     ];
 
     let m = data.len();
-    let result = czt::forward(&data, m, chirp!(m), c64::new(1.0, 0.0));
+    let result = data.transform(m, chirp!(m), c64::new(1.0, 0.0));
     assert::close(as_f64(&result), &expected_result[..], 1e-14);
 }
 
@@ -70,7 +70,7 @@ fn forward_complex() {
     ];
 
     let m = data.len() / 2;
-    let result = czt::forward(as_c64(&data), m, chirp!(m), c64::new(1.0, 0.0));
+    let result = as_c64(&data).transform(m, chirp!(m), c64::new(1.0, 0.0));
     assert::close(as_f64(&result), &expected_result[..], 1e-14);
 }
 
@@ -97,7 +97,7 @@ fn forward_complex_small_m() {
     ];
 
     let m = data.len() / 2 - 5;
-    let result = czt::forward(as_c64(&data), m, chirp!(m), c64::new(1.0, 0.0));
+    let result = as_c64(&data).transform(m, chirp!(m), c64::new(1.0, 0.0));
     assert::close(as_f64(&result), &expected_result[..], 1e-14);
 }
 
@@ -134,7 +134,7 @@ fn forward_complex_large_m() {
     ];
 
     let m = data.len() / 2 + 5;
-    let result = czt::forward(as_c64(&data), m, chirp!(m), c64::new(1.0, 0.0));
+    let result = as_c64(&data).transform(m, chirp!(m), c64::new(1.0, 0.0));
     assert::close(as_f64(&result), &expected_result[..], 1e-13);
 }
 
@@ -166,7 +166,7 @@ fn forward_complex_different_w() {
     ];
 
     let m = data.len() / 2;
-    let result = czt::forward(as_c64(&data), m, c64::from_polar(&1.0, &-42.0), c64::new(1.0, 0.0));
+    let result = as_c64(&data).transform(m, c64::from_polar(&1.0, &-42.0), c64::new(1.0, 0.0));
     assert::close(as_f64(&result), &expected_result[..], 1e-13);
 }
 
@@ -198,7 +198,7 @@ fn forward_complex_different_a() {
     ];
 
     let m = data.len() / 2;
-    let result = czt::forward(as_c64(&data), m, chirp!(m), c64::from_polar(&1.0, &-69.0));
+    let result = as_c64(&data).transform(m, chirp!(m), c64::from_polar(&1.0, &-69.0));
     assert::close(as_f64(&result), &expected_result[..], 1e-13);
 }
 
