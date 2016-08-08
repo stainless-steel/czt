@@ -81,3 +81,13 @@ impl<D, T> Transform<T> for [D] where D: Copy + Mul<Complex<T>, Output=Complex<T
         ((n - 1)..(n + m - 1)).map(|i| buffer1[i] * factor[i]).collect()
     }
 }
+
+/// Perform the transform.
+///
+/// The function is a shortcut for `Transform::transform`.
+#[inline(always)]
+pub fn transform<D, T>(data: &[D], m: usize, w: Complex<T>, a: Complex<T>) -> Vec<Complex<T>>
+    where D: Copy + Mul<Complex<T>, Output=Complex<T>>, T: Float
+{
+    Transform::transform(data, m, w, a)
+}
