@@ -38,7 +38,7 @@ fn forward_real() {
     ];
 
     let m = data.len();
-    let result = transform(&data, m, chirp!(m), c64::new(1.0, 0.0));
+    let result = transform(&data[..], m, chirp!(m), c64::new(1.0, 0.0));
     assert::close(as_f64(&result), &expected_result[..], 1e-14);
 }
 
