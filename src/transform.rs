@@ -12,48 +12,32 @@ pub trait Transform<T> {
     fn transform(&self, m: usize, w: Complex<T>, a: Complex<T>) -> Vec<Complex<T>>;
 }
 
-macro_rules! add_padding(
-    ($buffer:expr) => ({
-        let buffer = $buffer;
-        let zero = Complex::zero();
-        let capacity = buffer.capacity();
-        while buffer.len() < capacity {
-            buffer.push(zero);
-        }
-    });
-);
-
 impl<D, T> Transform<T> for [D] where D: Copy + Mul<Complex<T>, Output=Complex<T>>, T: Float {
     fn transform(&self, m: usize, w: Complex<T>, a: Complex<T>) -> Vec<Complex<T>> {
         use dft::{Operation, Plan, Transform};
         use num_traits::{One, Zero};
 
-        let n = self.len();
-        let factor = {
-            let two = T::one() + T::one();
-            let (modulus, argument) = w.to_polar();
-            ((-(n as isize) + 1)..(if n > m { n } else { m } as isize)).map(|i| {
-                let power = T::from(i * i).unwrap() / two;
-                Complex::from_polar(&modulus.powf(power), &(argument * power))
-            }).collect::<Vec<_>>()
-        };
-        let p = (n + m - 1).next_power_of_two();
-        let mut buffer1 = Vec::with_capacity(p);
-        {
-            let (modulus, argument) = a.to_polar();
-            for i in 0..n {
-                let power = -T::from(i).unwrap();
-                let a = Complex::from_polar(&modulus.powf(power), &(argument * power));
-                buffer1.push(self[i] * factor[n + i - 1] * a);
-            }
-        }
-        add_padding!(&mut buffer1);
+        let zero = Complex::zero();
         let one = Complex::one();
-        let mut buffer2 = Vec::with_capacity(p);
-        for i in 0..(n + m - 1) {
-            buffer2.push(one / factor[i]);
+        let two = T::one() + T::one();
+        let n = self.len();
+        let (modulus, argument) = w.to_polar();
+        let factor = ((-(n as isize) + 1)..(if n > m { n } else { m } as isize)).map(|i| {
+            let power = T::from(i * i).unwrap() / two;
+            Complex::from_polar(&modulus.powf(power), &(argument * power))
+        }).collect::<Vec<_>>();
+        let p = (n + m - 1).next_power_of_two();
+        let mut buffer1 = vec![zero; p];
+        let (modulus, argument) = a.to_polar();
+        for i in 0..n {
+            let power = -T::from(i).unwrap();
+            let a = Complex::from_polar(&modulus.powf(power), &(argument * power));
+            buffer1[i] = self[i] * factor[n + i - 1] * a;
         }
-        add_padding!(&mut buffer2);
+        let mut buffer2 = vec![zero; p];
+        for i in 0..(n + m - 1) {
+            buffer2[i] = one / factor[i];
+        }
         let plan = Plan::new(Operation::Forward, p);
         buffer1.transform(&plan);
         buffer2.transform(&plan);
