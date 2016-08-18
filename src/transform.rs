@@ -1,5 +1,5 @@
 use num_complex::Complex;
-use num_traits::Float;
+use num_traits::{Float, FloatConst};
 use std::ops::Mul;
 
 /// The transform.
@@ -12,7 +12,9 @@ pub trait Transform<T> {
     fn transform(&self, m: usize, w: Complex<T>, a: Complex<T>) -> Vec<Complex<T>>;
 }
 
-impl<D, T> Transform<T> for [D] where D: Copy + Mul<Complex<T>, Output=Complex<T>>, T: Float {
+impl<D, T> Transform<T> for [D]
+    where D: Copy + Mul<Complex<T>, Output=Complex<T>>, T: Float + FloatConst
+{
     fn transform(&self, m: usize, w: Complex<T>, a: Complex<T>) -> Vec<Complex<T>> {
         use dft::{Operation, Plan, Transform};
         use num_traits::{One, Zero};
