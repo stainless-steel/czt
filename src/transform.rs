@@ -19,8 +19,8 @@ impl<D, T> Transform<T> for [D]
         use dft::{Operation, Plan, Transform};
         use num_traits::{One, Zero};
 
-        let zero = Complex::zero();
-        let one = Complex::one();
+        let zero = Complex::<T>::zero();
+        let one = Complex::<T>::one();
         let two = T::one() + T::one();
         let n = self.len();
         let (modulus, argument) = w.to_polar();
