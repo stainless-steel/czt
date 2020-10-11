@@ -1,8 +1,6 @@
-# CZT [![Version][version-img]][version-url] [![Status][status-img]][status-url]
+# CZT [![Package][package-img]][package-url] [![Documentation][documentation-img]][documentation-url] [![Build][build-img]][build-url]
 
 The package provides an algorithm to compute the [chirp Z-transform][1].
-
-## [Documentation][documentation]
 
 ## Contribution
 
@@ -12,8 +10,9 @@ will be licensed according to the terms given in [LICENSE.md](LICENSE.md).
 
 [1]: https://en.wikipedia.org/wiki/Chirp_Z-transform
 
-[documentation]: https://docs.rs/czt
-[status-img]: https://travis-ci.org/stainless-steel/czt.svg?branch=master
-[status-url]: https://travis-ci.org/stainless-steel/czt
-[version-img]: https://img.shields.io/crates/v/czt.svg
-[version-url]: https://crates.io/crates/czt
+[build-img]: https://travis-ci.org/stainless-steel/czt.svg?branch=master
+[build-url]: https://travis-ci.org/stainless-steel/czt
+[documentation-img]: https://docs.rs/czt/badge.svg
+[documentation-url]: https://docs.rs/czt
+[package-img]: https://img.shields.io/crates/v/czt.svg
+[package-url]: https://crates.io/crates/czt
